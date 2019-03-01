@@ -80,7 +80,11 @@ indexeddb_test(
     tx.objectStore('store').put({});
     const request = tx.objectStore('store').get(1);
 
-    Object.prototype.a = {b: {c: 'on proto'}};
+    Object.defineProperty(Object.prototype, 'a', {
+      value: {b: {c: 'on proto'}},
+    });
+    assert_equals(Object.prototype.a.b.c, 'on proto',
+                  'Prototype should be configured for test');
 
     request.onerror = t.unreached_func('request should not fail');
     request.onsuccess = t.step_func(function() {
@@ -94,7 +98,7 @@ indexeddb_test(
       assert_equals(result.a.b.c, 1,
                     'Own property should match primary key generator value');
       assert_equals(Object.prototype.a.b.c, 'on proto',
-                  'Prototype should not be modified');
+                    'Prototype should not be modified');
       t.done();
     });
   },
